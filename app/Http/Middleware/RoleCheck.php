@@ -12,17 +12,29 @@ class RoleCheck
     /**
      * Handle an incoming request.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  mixed  ...$roles
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
-        foreach ($roles as $role) {
-            if (Auth::check() && Auth::user()->role == $role) {
-                return $next($request);
+        // Pastikan user sudah login
+        if (Auth::check()) {
+            // Cek apakah role user cocok dengan salah satu role yang diizinkan
+            foreach ($roles as $role) {
+                if (Auth::user()->role === $role) {
+                    return $next($request);
+                }
             }
+
+            // Jika role tidak cocok, arahkan ke dashboard (tanpa logout)
+            return redirect()
+                ->route('dashboard')
+                ->with('status', 'Anda tidak memiliki akses ke halaman ini.');
         }
 
-        Auth::logout();
-        return redirect()->route('login')->with('status', 'You are not authorized to access this page.');
+        // Jika belum login, arahkan ke halaman login
+        return redirect()->route('login');
     }
 }

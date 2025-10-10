@@ -21,6 +21,7 @@ return new class extends Migration
     $table->string("type");
     $table->string("information");
     $table->integer("qty");
+    $table->string("producer"); 
     $table->timestamps();
 });
 

@@ -15,6 +15,9 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    <x-nav-link :href="route('product-index')" :active="request()->routeIs('product-index')">
+                        {{ __('Product') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -33,8 +36,9 @@
                     </x-slot>
 
                     <x-slot name="content">
-                        <x-dropdown-link :href="route('profile.edit')">
-                            {{ __('Profile') }}
+                        
+                        <x-dropdown-link :href="route('product-index')">
+                            Product Master
                         </x-dropdown-link>
 
                         <!-- Authentication -->
@@ -82,7 +86,6 @@
                         </div>
                     </button>
                 </x-slot>
-
                 <x-slot name="content">
                     <x-dropdown-link :href="route('product-create')">
                         Product Master
