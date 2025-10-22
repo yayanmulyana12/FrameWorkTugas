@@ -13,12 +13,47 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-       // return view('layouts-percobaan.app');
-        $data = Product::all();
-        return view("master-data.product-master.index-product", compact("data"));
+        // Membuat query builder baru untuk model Product
+        $query = Product::query();
+
+        // 🔍 Pencarian
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('product_name', 'like', "%{$search}%")
+                    ->orWhere('unit', 'like', "%{$search}%")
+                    ->orWhere('type', 'like', "%{$search}%")
+                    ->orWhere('information', 'like', "%{$search}%")
+                    ->orWhere('producer', 'like', "%{$search}%");
+            });
+        }
+
+        // 🔄 Sorting dinamis
+        $allowedSorts = ['product_name', 'unit', 'type', 'information', 'qty', 'producer'];
+        $sort = $request->get('sort', 'product_name');      // kolom default
+        $direction = $request->get('direction', 'asc');     // arah default
+
+        // Pastikan kolom valid
+        if (!in_array($sort, $allowedSorts)) {
+            $sort = 'product_name';
+        }
+
+        // Urutkan berdasarkan kolom & arah yang dipilih
+        $query->orderBy($sort, $direction);
+
+        // 📄 Pagination (2 data per halaman)
+        $data = $query->paginate(2)->appends([
+            'search' => $request->search,
+            'sort' => $sort,
+            'direction' => $direction
+        ]);
+
+        // Kirim ke view
+        return view("master-data.product-master.index-product", compact("data", "sort", "direction"));
     }
+
 
     /**
      * Show the form for creating a new resource.
@@ -27,7 +62,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view ("master-data.product-master.create-product");
+        return view("master-data.product-master.create-product");
     }
 
     /**
@@ -40,16 +75,28 @@ class ProductController extends Controller
     {
         $validasi_data = $request->validate([
             'product_name' => 'required|string|max:255',
-            'unit' =>'required|string|max:50',
+            'unit' => 'required|string|max:50',
             'type' => 'required|string|max:50',
             'information' => 'nullable|string',
             'qty' => 'required|integer',
             'producer' => 'required|string|max:255',
         ]);
-       
-        Product::create($validasi_data);
-        return redirect()->back()->with('success','Product created successfully!');
+
+        try {
+            Product::create($validasi_data);
+
+            // Jika sukses → redirect ke halaman index dengan notifikasi sukses
+            return redirect()
+                ->route('product-index')
+                ->with('success', 'Produk berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            // Jika gagal → tetap di halaman sebelumnya dan tampilkan error
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal menambahkan produk: ' . $e->getMessage());
+        }
     }
+
 
     /**
      * Display the specified resource.
@@ -57,9 +104,11 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(string $id)
     {
-        //
+        $product = Product::findOrFail($id);
+        return view("master-data.product-master.detail-product", data: compact(var_name: 'product'));
+
     }
 
     /**
@@ -70,8 +119,8 @@ class ProductController extends Controller
      */
     public function edit(string $id)
     {
- $product = Product::findOrFail($id);
-    return view('master-data.product-master.edit-product', compact('product'));
+        $product = Product::findOrFail($id);
+        return view('master-data.product-master.edit-product', compact('product'));
     }
 
     /**
@@ -84,26 +133,36 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-        'product_name' => 'required|string|max:255',
-        'unit' => 'required|string|max:255',
-        'type' => 'required|string|max:255',
-        'information' => 'nullable|string',
-        'qty' => 'required|integer|min:1',
-        'producer' => 'required|string|max:255',
-    ]);
+            'product_name' => 'required|string|max:255',
+            'unit' => 'required|string|max:255',
+            'type' => 'required|string|max:255',
+            'information' => 'nullable|string',
+            'qty' => 'required|integer|min:1',
+            'producer' => 'required|string|max:255',
+        ]);
 
-        $product = Product::findOrFail($id);
-        $product->update([
-        'product_name' => $request->product_name,
-        'unit' => $request->unit,
-        'type' => $request->type,
-        'information' => $request->information,
-        'qty' => $request->qty,
-        'producer' => $request->producer,
-    ]);
+        try {
+            $product = Product::findOrFail($id);
 
-    return redirect()->back()->with('success', 'Product update successfully!');
+            $product->update([
+                'product_name' => $request->product_name,
+                'unit' => $request->unit,
+                'type' => $request->type,
+                'information' => $request->information,
+                'qty' => $request->qty,
+                'producer' => $request->producer,
+            ]);
 
+            // Jika berhasil → redirect ke halaman index
+            return redirect()
+                ->route('product-index')
+                ->with('success', 'Produk berhasil diperbarui!');
+        } catch (\Exception $e) {
+            // Jika error → kembali ke halaman sebelumnya dengan pesan error
+            return redirect()
+                ->back()
+                ->with('error', 'Gagal memperbarui produk: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -114,8 +173,12 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-         $product = Product::findOrFail($id);
-         $product->delete();
-         return redirect()->back()->with('success', 'Product deleted successfully!');
+        $product = Product::find($id);
+        if ($product) {
+            $product->delete();
+            return redirect()->back()->with('success', 'Product Udh Dihapus');
+
+        }
+        return redirect()->back()->with('error', 'Product nya ga ada');
     }
 }
