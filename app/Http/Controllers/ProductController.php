@@ -18,7 +18,7 @@ class ProductController extends Controller
         // Membuat query builder baru untuk model Product
         $query = Product::query();
 
-        // 🔍 Pencarian
+        // Pencarian
         if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
@@ -30,7 +30,7 @@ class ProductController extends Controller
             });
         }
 
-        // 🔄 Sorting dinamis
+        // Sorting dinamis
         $allowedSorts = ['product_name', 'unit', 'type', 'information', 'qty', 'producer'];
         $sort = $request->get('sort', 'product_name');      // kolom default
         $direction = $request->get('direction', 'asc');     // arah default
@@ -43,7 +43,7 @@ class ProductController extends Controller
         // Urutkan berdasarkan kolom & arah yang dipilih
         $query->orderBy($sort, $direction);
 
-        // 📄 Pagination (2 data per halaman)
+        // Pagination (2 data per halaman)
         $data = $query->paginate(2)->appends([
             'search' => $request->search,
             'sort' => $sort,

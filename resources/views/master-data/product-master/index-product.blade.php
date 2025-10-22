@@ -212,14 +212,14 @@
                 title: 'Berhasil!',
                 text: '{{ session('success') }}',
                 confirmButtonColor: '#10B981'
-                    })
+                            })
             @elseif (session('error'))
                 Swal.fire({
                     icon: 'error',
                 title: 'Gagal!',
                 text: '{{ session('error') }}',
                 confirmButtonColor: '#EF4444'
-                    })
+                            })
             @endif
     </script>
 
