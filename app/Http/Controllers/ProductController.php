@@ -3,8 +3,11 @@
 namespace App\Http\Controllers;
 
 
+use App\Exports\ProductsExport;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class ProductController extends Controller
 {
@@ -180,5 +183,9 @@ class ProductController extends Controller
 
         }
         return redirect()->back()->with('error', 'Product nya ga ada');
+    }
+    public function exportExcel(): BinaryFileResponse
+    {
+        return Excel::download(new ProductsExport, 'product.xlsx');
     }
 }

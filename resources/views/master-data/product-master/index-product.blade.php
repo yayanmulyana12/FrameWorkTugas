@@ -37,6 +37,13 @@
                 </button>
             </a>
 
+            <a href="{{ route('product-export-excel') }}">
+                <button
+                    class="px-6 py-3 mb-4 text-white bg-green-500 border border-green-500 rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    Download Data
+                </button>
+            </a>
+
             {{-- Tabel data produk --}}
             <table class="min-w-full border border-collapse border-gray-200">
                 <thead>
@@ -212,14 +219,14 @@
                 title: 'Berhasil!',
                 text: '{{ session('success') }}',
                 confirmButtonColor: '#10B981'
-                            })
+                                                })
             @elseif (session('error'))
                 Swal.fire({
                     icon: 'error',
                 title: 'Gagal!',
                 text: '{{ session('error') }}',
                 confirmButtonColor: '#EF4444'
-                            })
+                                                })
             @endif
     </script>
 
