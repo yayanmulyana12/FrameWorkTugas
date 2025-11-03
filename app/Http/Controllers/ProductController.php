@@ -2,12 +2,15 @@
 
 namespace App\Http\Controllers;
 
-
 use App\Exports\ProductsExport;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Maatwebsite\Excel\Facades\Excel;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Spatie\PdfToImage\Pdf as PdfToImage;
+use Illuminate\Support\Facades\Storage;
+
 
 class ProductController extends Controller
 {
@@ -188,4 +191,37 @@ class ProductController extends Controller
     {
         return Excel::download(new ProductsExport, 'product.xlsx');
     }
+
+    public function exportPDF()
+    {
+        $products = \App\Models\Product::all();
+
+        $startPeriod = \App\Models\Product::min('created_at')
+            ? date('d F Y', strtotime(\App\Models\Product::min('created_at')))
+            : now()->format('d F Y');
+        $endPeriod = now()->format('d F Y');
+
+        $pdf = Pdf::loadView('master-data.product-master.export-pdf', compact('products', 'startPeriod', 'endPeriod'))
+            ->setPaper('a4', 'landscape');
+
+        return $pdf->download('product.pdf');
+    }
+    public function exportJPG()
+    {
+        $products = \App\Models\Product::all();
+        $startPeriod = \App\Models\Product::min('created_at');
+        $endPeriod = \App\Models\Product::max('created_at');
+
+        $pdf = Pdf::loadView('master-data.product-master.export-pdf', compact('products', 'startPeriod', 'endPeriod'));
+        $pdfPath = storage_path('app/public/temp_product.pdf');
+        $jpgPath = storage_path('app/public/product.jpg');
+        $pdf->save($pdfPath);
+
+
+        $command = "gswin64c -sDEVICE=jpeg -dNOPAUSE -dBATCH -sOutputFile=\"{$jpgPath}\" \"{$pdfPath}\"";
+        exec($command);
+
+        return response()->download($jpgPath)->deleteFileAfterSend(true);
+    }
+
 }

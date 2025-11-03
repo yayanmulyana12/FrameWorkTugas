@@ -55,11 +55,11 @@ class ProductsExport implements FromCollection, WithHeadings, WithEvents
 
                 $sheet = $event->sheet->getDelegate();
 
-                // --- Tambahkan Logo di Kiri Atas ---
+
                 $drawing = new Drawing();
                 $drawing->setName('Company Logo');
                 $drawing->setDescription('Logo Perusahaan');
-                $drawing->setPath(public_path('images/logo.png')); // Pastikan path benar
+                $drawing->setPath(public_path('images/logo.png'));
                 $drawing->setHeight(80);
                 $drawing->setCoordinates('A1');
                 $drawing->setOffsetX(10);
