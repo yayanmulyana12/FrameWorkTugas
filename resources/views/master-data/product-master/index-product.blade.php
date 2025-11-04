@@ -32,14 +32,14 @@
             {{-- Tombol tambah data --}}
             <a href="{{ route('product-create') }}">
                 <button
-                    class="px-6 py-3 mb-4 text-white bg-green-500 border border-green-500 rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    class="px-6 py-3 mb-4 text-white bg-red-500 border border-red-500 rounded-lg shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-green-500">
                     Add Product Data
                 </button>
             </a>
 
             <a href="{{ route('product-export-excel') }}">
                 <button
-                    class="px-6 py-3 mb-4 text-white bg-green-500 border border-green-500 rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    class="px-6 py-3 mb-4 text-white bg-yellow-500 border border-yellow-500 rounded-lg shadow hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-green-500">
                     Download Excel
                 </button>
             </a>
@@ -53,8 +53,8 @@
 
             <a href="{{ route('product.export.jpg') }}">
                 <button
-                    class="px-6 py-3 mb-4 text-white bg-green-500 border border-green-500 rounded-lg shadow hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500">
-                    Download Jpg
+                    class="px-6 py-3 mb-4 text-white bg-orange-500 border border-orange-500 rounded-lg shadow hover:bg-orange-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+                    Download Gambar
                 </button>
             </a>
 
@@ -233,14 +233,14 @@
                 title: 'Berhasil!',
                 text: '{{ session('success') }}',
                 confirmButtonColor: '#10B981'
-                                                                        })
+                                                                                                    })
             @elseif (session('error'))
                 Swal.fire({
                     icon: 'error',
                 title: 'Gagal!',
                 text: '{{ session('error') }}',
                 confirmButtonColor: '#EF4444'
-                                                                        })
+                                                                                                    })
             @endif
     </script>
 
