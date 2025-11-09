@@ -10,6 +10,8 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Spatie\PdfToImage\Pdf as PdfToImage;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Supplier;
+
 
 
 class ProductController extends Controller
@@ -22,7 +24,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         // Membuat query builder baru untuk model Product
-        $query = Product::query();
+        $query = Product::with('supplier');
 
         // Pencarian
         if ($request->filled('search')) {
@@ -54,9 +56,7 @@ class ProductController extends Controller
             'search' => $request->search,
             'sort' => $sort,
             'direction' => $direction
-        ]);
-
-        // Kirim ke view
+        ]);        // Kirim ke view
         return view("master-data.product-master.index-product", compact("data", "sort", "direction"));
     }
 
@@ -68,7 +68,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-        return view("master-data.product-master.create-product");
+        $suppliers = \App\Models\Supplier::all();
+        return view("master-data.product-master.create-product", compact('suppliers'));
     }
 
     /**
@@ -79,6 +80,7 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
+
         $validasi_data = $request->validate([
             'product_name' => 'required|string|max:255',
             'unit' => 'required|string|max:50',
@@ -86,23 +88,22 @@ class ProductController extends Controller
             'information' => 'nullable|string',
             'qty' => 'required|integer',
             'producer' => 'required|string|max:255',
+            'supplier_id' => 'required|exists:suppliers,id', // foreign key valid
         ]);
 
         try {
+
             Product::create($validasi_data);
 
-            // Jika sukses → redirect ke halaman index dengan notifikasi sukses
             return redirect()
                 ->route('product-index')
                 ->with('success', 'Produk berhasil ditambahkan!');
         } catch (\Exception $e) {
-            // Jika gagal → tetap di halaman sebelumnya dan tampilkan error
             return redirect()
                 ->back()
                 ->with('error', 'Gagal menambahkan produk: ' . $e->getMessage());
         }
     }
-
 
     /**
      * Display the specified resource.
@@ -123,11 +124,13 @@ class ProductController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(string $id)
+    public function edit($id)
     {
         $product = Product::findOrFail($id);
-        return view('master-data.product-master.edit-product', compact('product'));
+        $suppliers = Supplier::all(); // tambahkan baris ini
+        return view('master-data.product-master.edit-product', compact('product', 'suppliers'));
     }
+
 
     /**
      * Update the specified resource in storage.

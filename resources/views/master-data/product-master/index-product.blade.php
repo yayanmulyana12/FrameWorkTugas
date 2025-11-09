@@ -65,88 +65,25 @@
                         <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">#</th>
 
                         {{-- Product Name --}}
-                        <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">
-                            <a href="{{ route('product-index', [
-    'sort' => 'product_name',
-    'direction' => (request('sort') == 'product_name' && request('direction') == 'asc') ? 'desc' : 'asc',
-    'search' => request('search')
-]) }}" class="hover:underline">
-                                Product Name
-                                @if (request('sort') == 'product_name')
-                                    {!! request('direction') == 'asc' ? '▲' : '▼' !!}
-                                @endif
-                            </a>
-                        </th>
+                        <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">Product Name</th>
 
                         {{-- Unit --}}
-                        <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">
-                            <a href="{{ route('product-index', [
-    'sort' => 'unit',
-    'direction' => (request('sort') == 'unit' && request('direction') == 'asc') ? 'desc' : 'asc',
-    'search' => request('search')
-]) }}" class="hover:underline">
-                                Unit
-                                @if (request('sort') == 'unit')
-                                    {!! request('direction') == 'asc' ? '▲' : '▼' !!}
-                                @endif
-                            </a>
-                        </th>
+                        <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">Unit</th>
 
                         {{-- Type --}}
-                        <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">
-                            <a href="{{ route('product-index', [
-    'sort' => 'type',
-    'direction' => (request('sort') == 'type' && request('direction') == 'asc') ? 'desc' : 'asc',
-    'search' => request('search')
-]) }}" class="hover:underline">
-                                Type
-                                @if (request('sort') == 'type')
-                                    {!! request('direction') == 'asc' ? '▲' : '▼' !!}
-                                @endif
-                            </a>
-                        </th>
+                        <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">Type</th>
 
                         {{-- Information --}}
-                        <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">
-                            <a href="{{ route('product-index', [
-    'sort' => 'information',
-    'direction' => (request('sort') == 'information' && request('direction') == 'asc') ? 'desc' : 'asc',
-    'search' => request('search')
-]) }}" class="hover:underline">
-                                Information
-                                @if (request('sort') == 'information')
-                                    {!! request('direction') == 'asc' ? '▲' : '▼' !!}
-                                @endif
-                            </a>
-                        </th>
+                        <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">Information</th>
 
                         {{-- Qty --}}
-                        <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">
-                            <a href="{{ route('product-index', [
-    'sort' => 'qty',
-    'direction' => (request('sort') == 'qty' && request('direction') == 'asc') ? 'desc' : 'asc',
-    'search' => request('search')
-]) }}" class="hover:underline">
-                                Qty
-                                @if (request('sort') == 'qty')
-                                    {!! request('direction') == 'asc' ? '▲' : '▼' !!}
-                                @endif
-                            </a>
-                        </th>
+                        <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">Qty</th>
 
                         {{-- Producer --}}
-                        <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">
-                            <a href="{{ route('product-index', [
-    'sort' => 'producer',
-    'direction' => (request('sort') == 'producer' && request('direction') == 'asc') ? 'desc' : 'asc',
-    'search' => request('search')
-]) }}" class="hover:underline">
-                                Producer
-                                @if (request('sort') == 'producer')
-                                    {!! request('direction') == 'asc' ? '▲' : '▼' !!}
-                                @endif
-                            </a>
-                        </th>
+                        <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">Producer</th>
+
+                        {{-- Supplier Name (baru) --}}
+                        <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">Supplier</th>
 
                         <th class="px-4 py-2 text-left text-gray-600 border border-gray-200">Aksi</th>
                     </tr>
@@ -156,7 +93,7 @@
                     {{-- Jika tidak ada data --}}
                     @if ($data->count() == 0)
                         <tr>
-                            <td colspan="8" class="text-center py-6 text-gray-500 font-semibold">
+                            <td colspan="9" class="text-center py-6 text-gray-500 font-semibold">
                                 Produk tidak ditemukan.
                             </td>
                         </tr>
@@ -177,6 +114,8 @@
                             <td class="px-4 py-2 border border-gray-200">{{ $item->information }}</td>
                             <td class="px-4 py-2 border border-gray-200">{{ $item->qty }}</td>
                             <td class="px-4 py-2 border border-gray-200">{{ $item->producer }}</td>
+                            {{-- tampilkan nama supplier --}}
+                            <td class="px-4 py-2 border border-gray-200">{{ $item->supplier->name ?? '-' }}</td>
                             <td class="px-4 py-2 border border-gray-200">
                                 <a href="{{ route('product-edit', $item->id) }}"
                                     class="px-2 text-blue-600 hover:text-blue-800">Edit</a>
@@ -225,24 +164,25 @@
                 form.submit();
             }
         }
-        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </script>
+
+    {{-- SweetAlert --}}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
-            @if (session('success'))
-                Swal.fire({
-                    icon: 'success',
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
                 title: 'Berhasil!',
                 text: '{{ session('success') }}',
                 confirmButtonColor: '#10B981'
-                                                                                                    })
-            @elseif (session('error'))
-                Swal.fire({
-                    icon: 'error',
+            })
+        @elseif (session('error'))
+            Swal.fire({
+                icon: 'error',
                 title: 'Gagal!',
                 text: '{{ session('error') }}',
                 confirmButtonColor: '#EF4444'
-                                                                                                    })
-            @endif
-    </script>
-
+            })
+        @endif
     </script>
 </x-app-layout>
